@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="UserMapper">
+
+    <resultMap id="UserInfoMap" type="com.ruhua.domain.user.UserInfo" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="username" property="userName" jdbcType="VARCHAR" />
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+        <result column="lastmodified" property="lastmodified" jdbcType="TIMESTAMP" />
+        <result column="status" property="status" jdbcType="INTEGER" />
+        <result column="pic" property="pic" jdbcType="VARCHAR" />
+        <result column="lable" property="lable" jdbcType="VARCHAR" />
+        <result column="age" property="age" jdbcType="INTEGER" />
+        <result column="love" property="love" jdbcType="INTEGER" />
+        <result column="community" property="community" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="User_Info_List" >
+    id, username, email, createtime, lastmodified, status, pic, lable, age,
+    sex, love, community
+  </sql>
+
+    <insert id="saveUserBaseInfo"
+            parameterType="com.ruhua.domain.user.BaseInfo">
+            INSERT INTO user(
+                  username,pass2Md5,email
+            ) VALUES (
+                 #{userName,jdbcType=VARCHAR},#{pass2Md5,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR}
+            )
+   </insert>
+
+    <!--查询所有分类-->
+    <select id="login" resultType="int" parameterType="com.ruhua.domain.user.BaseInfo">
+          select count(*) from user
+          where email = #{email,jdbcType=VARCHAR} and pass2Md5 = #{pass2Md5,jdbcType=VARCHAR}
+    </select>
+
+    <!--检验email个数-->
+    <select id="emailCount" resultType="int" parameterType="com.ruhua.domain.user.BaseInfo">
+          select count(*) from user
+          where email = #{email,jdbcType=VARCHAR}
+    </select>
+
+    <!--初始化用户设置-->
+    <insert id="initUserSetting"
+            parameterType="com.ruhua.domain.user.UserSetting">
+            INSERT INTO user_setting(
+                  email
+            ) VALUES (
+                 #{email,jdbcType=VARCHAR}
+            )
+   </insert>
+    <!--初始化用户资料-->
+    <insert id="initUserProfile"
+            parameterType="com.ruhua.domain.user.UserProfile">
+            INSERT INTO user_profile(
+                 email
+            ) VALUES (
+                 #{email,jdbcType=VARCHAR}
+            )
+   </insert>
+
+    <select id="queryUserInfoByEmail" resultMap="UserInfoMap" parameterType="java.lang.String" >
+        select
+        user.username, user.email, user.createtime, user.lastmodified, user.status, user_profile.pic,  user_profile.lable, user_setting.age,
+            user_setting.sex, user_setting.love, user_setting.community,user_setting.lng,user_setting.lat
+        from user,user_setting,user_profile
+        where user.email = user_setting.email and user.email = user_profile.email
+        and user.email = #{email,jdbcType=VARCHAR}
+    </select>
+
+    <!--保存用户设置-->
+    <update id="updateUserSetting"
+            parameterType="com.ruhua.domain.user.UserSetting">
+            UPDATE user_setting
+            SET age = #{age,jdbcType=INTEGER},
+                 sex = #{sex,jdbcType=INTEGER},
+                 love = #{love,jdbcType=INTEGER},
+                 community = #{community,jdbcType=VARCHAR},
+                 lastmodified = now(),
+                 lng = #{lng,jdbcType=DOUBLE},
+                 lat = #{lat,jdbcType=DOUBLE}
+            WHERE email = #{email,jdbcType=VARCHAR}
+   </update>
+    <!--查询用户照片-->
+    <select id="queryUserPic" resultType="String"
+            parameterType="com.ruhua.domain.user.UserProfile">
+            select pic from user_profile
+            WHERE email = #{email,jdbcType=VARCHAR}
+   </select>
+    <!--保存用户照片-->
+    <update id="updateUserPic"
+            parameterType="com.ruhua.domain.user.UserProfile">
+            UPDATE user_profile
+            SET pic = #{pic,jdbcType=VARCHAR},
+                 lastmodified = now()
+            WHERE email = #{email,jdbcType=VARCHAR}
+   </update>
+
+    <!--保存用户标签-->
+    <update id="updateUserLable"
+            parameterType="com.ruhua.domain.user.UserProfile">
+            UPDATE user_profile
+            SET lable = #{lable,jdbcType=VARCHAR},
+                 lastmodified = now()
+            WHERE email = #{email,jdbcType=VARCHAR}
+   </update>
+
+</mapper>

@@ -1,0 +1,144 @@
+div#head {
+	margin-top:10px;
+	margin-left: auto;
+	margin-right:auto;
+	text-align: center;
+}
+div#head img {
+	border-radius:50%;
+	border: solid 2px rgb(57, 150, 184);
+}
+div#profile {
+	text-align: center;
+	font-size: 10px;
+}
+div#name {
+	font-size: 14px;
+	font-weight: bold;
+}
+div#time {
+	margin-top: 5px;
+	font-size: 10px;
+	color: rgb(150, 150, 150);
+}
+.bar {
+	border-bottom: 0px;
+}
+div#me-content {
+	margin-left: auto;
+	margin-right:auto;
+	width:90%;
+	margin-top:50px;
+	margin-bottom: 20px;
+	background-color:rgba(247,247,247,.98);
+}
+div.me-content-left {
+	float:left;
+	width:49%;
+}
+div.me-content-right {
+	float:right;
+	width:49%;
+}
+.person-head{
+	width:100%;
+}
+div.button-swtich-area {
+	position: relative;
+}
+div.segmented-control {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+.sex-fire:before {
+	content:"女";
+}
+.sex-fire.active:before {
+	content:"男";
+}
+
+.table-view-cell>.badge {
+	top:20%;
+}
+.table-view-cell>a>.badge {
+	top:20%;
+}
+.dashantime {
+	font-size: 12px;
+	color: rgb(197, 197, 197);
+}
+img.dawodehead {
+	border-radius:50%;
+	border: solid 1px #FF64F7;
+}
+.input-row input {
+    float: left;
+}
+#setting-community {
+    width: 40%;
+}
+#setting-community-choose {
+    margin-top:3px;
+    float: right;
+    margin-right:5px;
+}
+.btn-disable {
+    color: rgb(211, 197, 197);
+}
+.community-choose {
+    display: inline-block;
+    padding: 6px 13px 6px;
+    font-size: 13px;
+    line-height: 1;
+    color: #333;
+    background-color: rgba(163, 163, 163, 0.15);
+    border-radius: 100px;
+    border: 1px solid gray;
+    margin-top:10px;
+    margin-right:10px;
+    margin-left:10px;
+}
+.community-choose-active {
+    background-color: rgb(123, 123, 123);
+    color: white;
+}
+#surroundedCommunity {
+    margin-right:10px;
+}
+#main {
+    float: left;
+    height: auto;
+    width: auto;
+    margin:10px;
+    max-height:90px;
+}
+
+.slide-text {
+    position: relative;
+    margin-top: -30px;
+    float: right;
+}
+div#left {
+    float: left;
+}
+div#right {
+    float: right;
+    margin-left:10px;
+    width:70%;
+}
+div#left img {
+    border-radius:50%;
+    border: solid 2px #FF64F7;
+}
+div#profile {
+    text-align: center;
+    font-size: 10px;
+}
+div#name {
+    font-size: 14px;
+    font-weight: bold;
+}
+#l-map {
+    height: 50%;
+    margin-top: -15px;
+}

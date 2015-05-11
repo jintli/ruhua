@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="BindingMapper">
+
+    <insert id="insertBingding" parameterType="com.ruhua.domain.binding.Binding">
+            INSERT INTO binding(
+                  openid,erp
+            ) VALUES (
+                 #{openid,jdbcType=VARCHAR},#{erp,jdbcType=VARCHAR}
+            )
+   </insert>
+
+    <!--查询所有分类-->
+    <delete id="deleteOpenid" parameterType="java.lang.String">
+          delete from  binding
+           where openid = #{openid,jdbcType=VARCHAR}
+    </delete>
+
+    <select id="query" resultType="java.lang.String" parameterType="java.lang.String">
+          select erp from  binding
+           where openid = #{openid,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="insertQ" parameterType="com.ruhua.domain.binding.Binding">
+            INSERT INTO binding_q(
+                  erp,q
+            ) VALUES (
+                 #{erp,jdbcType=VARCHAR},#{q,jdbcType=VARCHAR}
+            )
+   </insert>
+
+</mapper>

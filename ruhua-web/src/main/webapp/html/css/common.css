@@ -1,0 +1,67 @@
+body {
+    background-color: white;
+}
+.content {
+  font-family: Arial, Helvetica, sans-serif;
+    background-color: white !important;
+}
+a.icon {
+  color: #838383;
+}
+.badge-color-1 {
+	background-color:cyan;
+}
+.badge-color-2 {
+	background-color: cadetblue;
+}
+.badge-color-3 {
+	background-color: indianred;
+}
+.badge-color-4 {
+	background-color: blanchedalmond;
+}
+.badge-color-5 {
+	background-color: darkcyan;
+	color:white;
+}
+.badge-color-6 {
+	background-color: darkred;
+	color:white;
+}
+.badge-color-7 {
+	background-color: salmon;
+}
+.badge-color-8 {
+	background-color: aliceblue;
+}
+.badge-color-9 {
+	background-color: firebrick;
+	color:white;
+}
+.badge-color-10 {
+	background-color: floralwhite;
+}
+.badge-color-11 {
+	background-color: gold;
+}
+.badge-color-12 {
+	background-color: hotpink;
+}
+.badge-color-13 {
+	background-color: yellowgreen;
+}
+
+#floater	{
+    float:left; height:50%; margin-bottom:-120px;
+}
+#empty-da	{
+    clear:both; height:240px; position:relative;
+    text-align: center;
+}
+.empty-da-info {
+    color:gray;
+    font-size:0.5em;
+}
+.empty-da-img {
+    opacity:0.5;
+}

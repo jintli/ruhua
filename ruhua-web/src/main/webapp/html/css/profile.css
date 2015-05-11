@@ -1,0 +1,42 @@
+table tr {
+}
+table td {
+    padding:10px;
+}
+
+table {
+    width:100%;
+}
+.pic-operate {
+    position: fixed;
+    opacity: 0.5;
+    margin-left: -15px;
+    margin-top:-15px;
+}
+.badgeArea {
+    padding:10px;
+}
+#hadBadge {
+    border-bottom: solid 1px rgb(213, 209, 183);
+    padding-bottom: 5px;
+}
+#chooseBadge {
+    padding-top:5px;
+}
+.badge-plus-action {
+    opacity: 0.5;
+    width: 20px;
+    margin-left: -15px;
+}
+#addBadge {
+    margin-top:10px;
+}
+.picinput {
+    display:none;
+}
+.headProfileImg {
+    max-width: 300px;
+}
+.profileimg {
+    max-width: 200px;
+}

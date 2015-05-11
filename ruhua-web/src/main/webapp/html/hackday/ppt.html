@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>问答抽奖</title>
+<style>
+    body {
+        background-image:url("img/bg.jpg");
+        margin-top:0;margin-left:auto;
+        filter:"progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale')";
+        -moz-background-size:100% 100%;
+        background-size:100%;
+    }
+    #marqueeArea {
+        z-index:9999;
+        width:100%;
+    }
+    #marqueeArea span{
+        background:rgba(255,255,255,0.4);
+    }
+    #demo {
+        margin-top: 10px;;
+        background: #FFF;
+        overflow:hidden;
+        border: 1px dashed #CCC;
+        width: 100%;
+        height: 1000px;;
+    }
+    #demo img {
+        border: 3px solid #F2F2F2;
+    }
+    #indemo {
+        float: left;
+        width: 800%;
+    }
+    #demo1 {
+        float: left;
+    }
+    #demo2 {
+        float: left;
+    }
+    #demo1 img {
+        height: 1000px;
+    }
+    #demo1 a {
+        margin-right:100px;
+    }
+</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=2.0">
+<script type="text/javascript" src="src/jquery-2.1.1.min.js"></script>
+    <script>
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+        var wHeight = 0;
+        $(document).ready(function(){
+            wHeight = window.screen.availHeight;
+//            initWorker();
+        });
+
+        function GetRandomNum(Min,Max)
+        {
+            var Range = Max - Min;
+            var Rand = Math.random();
+            return(Min + Math.round(Rand * Range));
+        }
+        var getHostUrl = function(){
+            var __url__ = window.location.protocol + "//" ;
+            __url__ += window.location.hostname ;
+            __url__ += !!window.location.port ? ":"+ window.location.port : "";
+            __url__ += "";
+            return __url__;
+        };
+
+        //初始化调用方法
+        function initWorker(){
+            window.setInterval(function () {
+                getChangesMsg();
+            }, 500);
+        }
+        function GetRandomNum(Min,Max)
+        {
+            var Range = Max - Min;
+            var Rand = Math.random();
+            return(Min + Math.round(Rand * Range));
+        }
+        var getHostUrl = function(){
+            var __url__ = window.location.protocol + "//" ;
+            __url__ += window.location.hostname ;
+            __url__ += !!window.location.port ? ":"+ window.location.port : "";
+            __url__ += "";
+            return __url__;
+        };
+        var colors = ['blue','green','yellow','purple'];
+        var id = 1;
+        var getChangesMsg = function() {
+            var url = getHostUrl()+ "/danmu/getMsg";
+            $.get(url,
+                    null,
+                    function (data) {
+                        //处理消息变化
+                        if(data.data.length <= 0) {return;}
+                        var msgjson = data.data.split("###");
+                        var msg = "";
+                        var top = 0;
+                        for(var i=0;i<msgjson.length;i++) {
+                            var name = msgjson[i].split("---")[0];
+                            var mess = msgjson[i].split("---")[1];
+                            msg = "<marquee id='"+(id++)+"' behavior=\"scroll\" onclick=\"showName($(this),'"+name+"','"+mess+"')\"" +
+                                    " onfinish=\"$(this).remove();\" onMouseOut=\"this.start();\" onMouseOver=\"this.stop();\" loop=\"1\" scrollamount=\""+GetRandomNum(10,20)+"\" " +
+                                    "style=\"position:fixed;width:100%;z-index:999;margin-top:"+GetRandomNum(0,wHeight-300)+"px;height:80px;\">"+
+                                    "<span style=\"opacity:0.9;font-size:"+GetRandomNum(50,60)+"px;color:green\">"+ mess +"</span>"+
+                                    "</marquee>";
+                            $("#marqueeArea").append(msg);
+                        }
+                    }
+            );
+        };
+        var showName = function(that,name,mess) {
+            var url = getHostUrl()+ "/binding/queryErp";
+            var erp;
+            $.ajaxSetup({
+                async : false
+            });
+            $.get(url,
+                {openid:name},
+                function (data) {
+                    erp = data;
+                }
+            );
+            that.find("span").text("恭喜" + erp + "中奖！");
+            that.find("span").css("color","red");
+            url = getHostUrl()+ "/binding/saveQ";
+            $.get(url,
+                {erp:erp,q:encodeURIComponent(mess)},
+                function (data) {
+                }
+            );
+        }
+    </script>
+</head>
+<body>
+<div id="marqueeArea">
+</div>
+<div id="demo">
+    <div id="indemo">
+        <div id="demo1">
+            <a href="#"><img height="800px" src="img/1.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/2.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/3.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/4.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/5.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/6.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/7.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/8.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/9.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/10.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/11.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/12.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/13.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/14.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/15.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/16.jpg" border="0" /></a>
+            <a href="#"><img height="800px" src="img/17.jpg" border="0" /></a>
+        </div>
+        <div id="demo2"></div>
+    </div>
+</div>
+
+<script language="javascript">
+    var speed=30;
+    var demo = $("#demo");
+    var demo1 = $("#demo1");
+    var demo2 = $("#demo2");
+    demo2.html(demo1.html());
+    function Marquee(){
+        if(demo.scrollLeft()>=demo1.width())
+            demo.scrollLeft(0);
+        else{
+            demo.scrollLeft(demo.scrollLeft()+3);
+        }
+    }
+    var MyMar=setInterval(Marquee,speed)
+    demo.mouseover(function() {
+        clearInterval(MyMar);
+    } )
+    demo.mouseout(function() {
+        MyMar=setInterval(Marquee,speed);
+    } )
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="RecommendMapper">
+
+    <resultMap id="UserInfoMap" type="com.ruhua.domain.user.UserInfo" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="username" property="userName" jdbcType="VARCHAR" />
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+        <result column="like_createtime" property="likeCreateTime" jdbcType="VARCHAR" />
+        <result column="lastmodified" property="lastmodified" jdbcType="TIMESTAMP" />
+        <result column="status" property="status" jdbcType="INTEGER" />
+        <result column="pic" property="pic" jdbcType="VARCHAR" />
+        <result column="lable" property="lable" jdbcType="VARCHAR" />
+        <result column="age" property="age" jdbcType="INTEGER" />
+        <result column="love" property="love" jdbcType="INTEGER" />
+        <result column="community" property="community" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!--查询所有分类-->
+    <select id="queryRecommendEmail" resultType="Map" >
+        SELECT email FROM user_setting
+        WHERE #{maxLat} >= lat AND lat >= #{minLat}
+        AND #{maxLng} >= lng AND lng >= #{minLng}
+        <![CDATA[
+        AND email <> #{email}
+        ]]>
+        AND sex = #{love}
+        AND NOT EXISTS (SELECT 1 FROM recommend_like where email = #{email} and like_email = user_setting.email)
+        AND NOT EXISTS (SELECT 1 FROM recommend_dislike where email = #{email} and dislike_email = user_setting.email)
+    </select>
+
+    <!--更新喜欢的人-->
+    <insert id="insertLikePerson" parameterType="Map" >
+        insert into recommend_like (email,like_email) values (#{email},#{target_email})
+    </insert>
+
+    <!--更新不喜欢的人-->
+    <insert id="insertDislikePerson" parameterType="Map" >
+        insert into recommend_dislike (email,dislike_email) values (#{email},#{target_email})
+    </insert>
+
+    <select id="queryLikeMeUserInfo" resultMap="UserInfoMap" parameterType="java.lang.String" >
+        SELECT recommend_like.email,DATE_FORMAT(recommend_like.createtime,'%Y-%m-%d %H:%i:%S') as like_createtime,user.username,user_profile.pic,user_setting.community,user_setting.age
+        FROM recommend_like
+        LEFT JOIN USER ON user.email = recommend_like.email
+        LEFT JOIN user_profile ON user_profile.email = recommend_like.email
+        LEFT JOIN user_setting ON user_setting.email = recommend_like.email
+        WHERE like_email = #{email,jdbcType=VARCHAR}
+        order by recommend_like.createtime
+    </select>
+
+
+</mapper>

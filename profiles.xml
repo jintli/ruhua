@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profilesXml xmlns="http://maven.apache.org/PROFILES/1.0.0"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://maven.apache.org/PROFILES/1.0.0 http://maven.apache.org/xsd/profiles-1.0.0.xsd">
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <!--数据库连接的方式-->
+                <mvn.jdbc.driver>com.mysql.jdbc.Driver</mvn.jdbc.driver>
+                <mvn.jdbc.url>jdbc:mysql://localhost:3306/ruhua</mvn.jdbc.url>
+                <!--数据库连接的方式-->
+                <mvn.jdbc.username>root</mvn.jdbc.username>
+                <mvn.jdbc.password>123456</mvn.jdbc.password>
+
+                <mvn.o2o.privilege.appCode>o2o-officer</mvn.o2o.privilege.appCode>
+                <mvn.o2o.privilege.appToken>123456</mvn.o2o.privilege.appToken>
+
+                <mvn.log.level>DEBUG</mvn.log.level>
+                <mvn.log.path>/export/Logs</mvn.log.path>
+                <ond.jd.com.client>lsp_one_m_wechat</ond.jd.com.client>
+                <ond.jd.com.clientVersion>1.0</ond.jd.com.clientVersion>
+                <mvn.saf-zookeeper.url>192.168.229.53:2181,192.168.229.54:2181,192.168.229.55:2181</mvn.saf-zookeeper.url>
+                <mvn.saf.floatingipfile>/etc/floatingip</mvn.saf.floatingipfile>
+
+                <!-- redis configuration -->
+                <mvn.redis.client.configId>/redis/cluster/70</mvn.redis.client.configId>
+                <mvn.redis.client.token>1382423507510</mvn.redis.client.token>
+                <mvn.redis.cacheVersion>o2o-wechat-dev-v1-</mvn.redis.cacheVersion>
+                <mvn.redis.cacheDefaultSeconds>86400</mvn.redis.cacheDefaultSeconds>
+                <!--saf server start-->
+                <saf.o2o.jdone.wechat.group>o2o-jdone-wechat-lijing3</saf.o2o.jdone.wechat.group>
+                <saf.o2o.jdone.wechat.version>1.0.0</saf.o2o.jdone.wechat.version>
+                <!--saf server end-->
+                <!--location sservice test-->
+                <mvn.saf.o2o.location.service.group>o2o_lsp_store_test</mvn.saf.o2o.location.service.group>
+                <mvn.saf.o2o.location.service.version>5.0.0</mvn.saf.o2o.location.service.version>
+                <mvn.saf.o2o.privilege.group>josl-privilege</mvn.saf.o2o.privilege.group>
+                <mvn.saf.o2o.privilege.version>5.0.0</mvn.saf.o2o.privilege.version>
+                <!-- session超时时间，单位秒 -->
+                <mvn.web.session.timeOut>3600</mvn.web.session.timeOut>
+                <!-- session超时时间小于此时间重置session时效的时间，单位秒 -->
+                <mvn.web.session.resetTime>300</mvn.web.session.resetTime>
+                <mvn.web.session.userSessionKey>wechat.o2o.jd.com</mvn.web.session.userSessionKey>
+                <lspapp.service.url.prefix>http://prelspapp.jd.com/</lspapp.service.url.prefix>
+                <!-- wechat相关 -->
+                <JD_O2O_WECHAT_TOKEN>154f1e5f2m34feLKMl8y8H</JD_O2O_WECHAT_TOKEN>
+                <wechat.impl.wechat_app_id>wxbcb9b738cdbba307</wechat.impl.wechat_app_id>
+                <wechat.impl.wechat_app_secret>efc7a152fe424c3a3dda5bed45e54ccc</wechat.impl.wechat_app_secret>
+                <jd.o2o.wechat.publicUrl>http://dev.wechat.o2o.jd.ngrok.com</jd.o2o.wechat.publicUrl>
+            </properties>
+        </profile>
+        <profile>
+            <id>production</id>
+            <properties>
+                <!--数据库连接的方式-->
+                <mvn.jdbc.driver>com.mysql.jdbc.Driver</mvn.jdbc.driver>
+                <mvn.jdbc.url>jdbc:mysql://ruhua001.mysql.rds.aliyuncs.com:3306/ruhua</mvn.jdbc.url>
+                <!--数据库连接的方式-->
+                <mvn.jdbc.username>jintli</mvn.jdbc.username>
+                <mvn.jdbc.password>Jl891020</mvn.jdbc.password>
+
+                <mvn.log.level>DEBUG</mvn.log.level>
+                <mvn.log.path>/export/Logs</mvn.log.path>
+                <ond.jd.com.client>lsp_one_m_wechat</ond.jd.com.client>
+                <ond.jd.com.clientVersion>1.0</ond.jd.com.clientVersion>
+                <mvn.saf-zookeeper.url>172.17.3.181:2181,172.17.3.182:2181,172.17.3.183:2181,172.17.18.17:2181,172.17.18.18:2181</mvn.saf-zookeeper.url>
+                <mvn.saf.floatingipfile>/etc/floatingip</mvn.saf.floatingipfile>
+
+                <!-- redis config start -->
+                <mvn.redis.config.name>config-production</mvn.redis.config.name>
+                <!-- redis config end -->
+                <!-- redis configuration -->
+                <mvn.redis.client.configId>/redis/cluster/183</mvn.redis.client.configId>
+                <mvn.redis.client.token>1384763119466</mvn.redis.client.token>
+                <mvn.redis.cacheVersion>o2o-wechat-production-v1-</mvn.redis.cacheVersion>
+                <mvn.redis.cacheDefaultSeconds>86400</mvn.redis.cacheDefaultSeconds>
+                <!--saf server start-->
+                <saf.o2o.jdone.wechat.group>o2o-jdone-wechat</saf.o2o.jdone.wechat.group>
+                <saf.o2o.jdone.wechat.version>1.0.0</saf.o2o.jdone.wechat.version>
+                <!--saf server end-->
+                <!--location sservice production-->
+                <mvn.saf.o2o.location.service.group>o2o-lsp-store</mvn.saf.o2o.location.service.group>
+                <mvn.saf.o2o.location.service.version>1.0.0</mvn.saf.o2o.location.service.version>
+                <mvn.saf.o2o.privilege.group>josl-privilege</mvn.saf.o2o.privilege.group>
+                <mvn.saf.o2o.privilege.version>1.0.0</mvn.saf.o2o.privilege.version>
+                <!-- session超时时间，单位秒 -->
+                <mvn.web.session.timeOut>3600</mvn.web.session.timeOut>
+                <!-- session超时时间小于此时间重置session时效的时间，单位秒 -->
+                <mvn.web.session.resetTime>300</mvn.web.session.resetTime>
+                <mvn.web.session.userSessionKey>wechat.o2o.jd.com</mvn.web.session.userSessionKey>
+                <lspapp.service.url.prefix>http://lspapp.jd.com/</lspapp.service.url.prefix>
+                <!-- wechat相关 -->
+                <JD_O2O_WECHAT_TOKEN>154f1e5f2m34feLKMl8y8H</JD_O2O_WECHAT_TOKEN>
+                <wechat.impl.wechat_app_id>wxbcb9b738cdbba307</wechat.impl.wechat_app_id>
+                <wechat.impl.wechat_app_secret>efc7a152fe424c3a3dda5bed45e54ccc</wechat.impl.wechat_app_secret>
+                <jd.o2o.wechat.publicUrl>http://wechat.o2o.jd.com</jd.o2o.wechat.publicUrl>
+            </properties>
+        </profile>
+    </profiles>
+</profilesXml>

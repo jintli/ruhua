@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>搭讪</title>
+
+    <!-- Sets initial viewport load and disables zooming  -->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+    <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!-- Include the compiled Ratchet CSS -->
+    <link href="css/ratchet.min.css" rel="stylesheet">
+    <link href="css/common.css" rel="stylesheet">
+    <!-- Optionally, include either the iOS or Android theme -->
+    <!-- <link href="/css/ratchet-theme-ios.min.css" rel="stylesheet"> -->
+    <!-- Include the compiled Ratchet JS -->
+    <script src="js/ratchet.min.js"></script>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/touch.js"></script>
+    <script src="js/jam.js"></script>
+    <script src="js/common.js"></script>
+    <script language="javascript" type="text/javascript">
+      $(function(){
+          generateRecommend();
+          $("#likeButton").live("tap",function() {
+            getData("/recommend/insertLikePerson.json",{email:$("#email").val()},function(data) {
+                if(data.retCode == 0) {
+                    var email_list = sessionStorage.getItem("recommend_email_list");
+                    email_list = email_list.split(",");
+                    email_list.remove($("#email").val());
+                    sessionStorage.setItem("recommend_email_list",email_list);
+                    generateRecommend();
+                }
+            });
+          });
+          $("#dislikeButton").live("tap",function() {
+              getData("/recommend/insertDislikePerson.json",{email:$("#email").val()},function(data) {
+                  if(data.retCode == 0) {
+                      var email_list = sessionStorage.getItem("recommend_email_list");
+                      email_list = email_list.split(",");
+                      email_list.remove($("#email").val());
+                      sessionStorage.setItem("recommend_email_list",email_list);
+                      generateRecommend();
+                  }
+              });
+          });
+      });
+      var getRecommendFromServer = function() {
+          getData("/recommend/queryTodayRecommend.json",null,function(data) {
+              if(data.retCode == 0) {
+                  var emaillist = data.data;
+                  var emailArray = [];
+                  for(var i=0;i<emaillist.length;i++) {
+                      emailArray.push(emaillist[i].email);
+                  }
+                  sessionStorage.setItem("recommend_email_list",emailArray);
+                  if(emailArray.length > 0) {
+                      generateRecommend();
+                  } else {
+                      $("#main").remove();
+                      $("#mySlider").remove();
+                      $(".loveArea").css("display","none");
+                      $("#empty-da-img").attr("src","img/operate/recommend_null.ico");
+                      $("#empty-da-info").text("已经没有更多推荐了");
+                      $("#floater").show();
+                      $("#empty-da").show();
+                  }
+              } else if(data.retCode == 401) {
+                  //用户信息不完整
+                  $("#empty-da-img").attr("src","img/operate/empty.ico");
+                  $("#empty-da-img").attr("onclick","location.href='profile.html'");
+                  $("#empty-da-info").text("请完善信息");
+              }
+          });
+      };
+      var generateRecommend = function() {
+          var email_list = sessionStorage.getItem("recommend_email_list");
+          if(email_list == null || email_list.length <= 0) {
+              getRecommendFromServer();
+          } else {
+              $("#main").remove();
+              $("#mySlider").remove();
+              email_list = email_list.split(",");
+              var email = email_list[0];
+              getData("/recommend/queryRecommendInfo.json",{email:email},function(data) {
+                  if(data.retCode == 0) {
+                      $("#floater").hide();
+                      $("#empty-da").hide();
+                      var userInfo = data.data;
+                      var badgeHtml = "";
+                      //标签
+                      var lable = userInfo.lable;
+                      if(lable != null) {
+                          var lableJson = JSON.parse(lable);
+                          for(var i=0;i<lableJson.length;i++) {
+                              badgeHtml += "<span class=\"badge badge-color-"+GetRandomNum(1,13)+"\">" + lableJson[i].k
+                                      + "</span>";
+                          }
+                      }
+                      var sliderHtml = "<div class=\"slider\" id=\"mySlider\">" +
+                                        "<div class=\"slide-group\">";
+                      var pic = userInfo.pic;
+                      if(pic != null) {
+                          var picJson = JSON.parse(pic);
+                          var commonSliderHtml = "<div class=\"slide\">"+
+                                                  "<img width=\"100%\" src=\"imgsrc\">"+
+                                                  "corner</div>";
+                          if(picJson.pic002 != null) {
+                              sliderHtml += commonSliderHtml.replace("imgsrc",picJson.pic002);
+                          }
+                          if(picJson.pic003 != null) {
+                              sliderHtml += commonSliderHtml.replace("imgsrc",picJson.pic003);
+                          }
+                          if(picJson.pic004 != null) {
+                              sliderHtml += commonSliderHtml.replace("imgsrc",picJson.pic004);
+                          }
+                          if(picJson.pic005 != null) {
+                              sliderHtml += commonSliderHtml.replace("imgsrc",picJson.pic005);
+                          }
+                          if(picJson.pic006 != null) {
+                              sliderHtml += commonSliderHtml.replace("imgsrc",picJson.pic006);
+                          }
+                          sliderHtml = sliderHtml.substr(0,sliderHtml.length - 12) + "</div>";
+                          sliderHtml = sliderHtml.replace(/corner/g,"<span class=\"slide-text\">" +
+                                            "<span class=\"icon icon-left-nav\"></span>" +
+                                            "</span>");
+                      }
+                      sliderHtml += "</div></div>";
+                      var headPic = "";
+                      if(userInfo.pic != null) {
+                          headPic = JSON.parse(userInfo.pic).pic001;
+                      }
+                      var mainHtml = "<div id=\"main\"><div id=\"left\"><img width=80 height=80 src=\""+headPic+"\" /></div>"+
+                      "<div id=\"right\">" +
+                              "<div id=\"left_1\" class=\"left_div\"> "+
+                      "<span class=\"badge\">"+userInfo.userName+"</span> <input type='hidden' id='email' value=\""+userInfo.email+"\"/>"+
+                      "<span class=\"badge\">"+userInfo.age+"</span> "+
+                      "<span class=\"badge\">"+userInfo.community+"</span> "+
+                      "</div>"+
+                      "<div id=\"left_2\" class=\"left_div\"> "+
+                              badgeHtml +
+                      "</div> "+
+                      "</div> "+
+                      "</div>" + sliderHtml + "</div>";
+                      $("#content").append(mainHtml);
+                      $(".loveArea").css("display","block");
+                      var rightHeight = $(".content").width() - 30 - $("#left").width();
+                      $("#right").css({width:rightHeight});
+                  }
+              });
+          }
+      };
+    </script>
+  </head>
+  <body>
+
+    <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
+    <div id="content" class="content">
+      <div class="loveArea">
+        <button id="likeButton" class="btn btn-positive">喜欢</button>
+        <button id="dislikeButton" class="btn btn-positive">不喜欢</button>
+      </div>
+        <div id="floater"></div>
+        <div id="empty-da">
+            <div><img id="empty-da-img" class="empty-da-img" src="img/operate/loading.gif"/> </div>
+            <span id="empty-da-info" class="empty-da-info">寻觅中，请稍后...</span>
+        </div>
+      <nav class="bar bar-tab">
+        <a class="tab-item active" href="#">
+          <span class="icon icon-sound2"></span>
+          <span class="tab-label">搭讪</span>
+        </a>
+        <a class="tab-item" onclick="location.href='yue.html'">
+          <span class="icon icon-forward"></span>
+          <span class="tab-label">约会</span>
+        </a>
+        <a class="tab-item" onclick="location.href='me.html'">
+          <span class="icon icon-person"></span>
+          <span class="tab-label">我</span>
+        </a>
+      </nav>
+
+    </div>
+    <link href="css/common.css" rel="stylesheet">
+    <link href="css/da.css" rel="stylesheet">
+  </body>
+</html>

@@ -1,0 +1,85 @@
+.content {
+  background-color: #00001C !important;;
+  font-family: Arial, Helvetica, sans-serif;
+}
+div#background-logo{ 
+  top:0; 
+  left:0; 
+  right:0; 
+  z-index:-1; 
+} 
+div#background-logo > img {
+  height:100%; 
+  width:100%; 
+  border:0; 
+  -webkit-touch-callout:none;
+} 
+div#function_segment {
+  position: fixed;
+  bottom: 8%;
+  width: 100%;
+}
+div#reg_login_button {
+  width:90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+#qq_login {
+  padding:10px;
+}
+#qq_login >img {
+  position: absolute;
+  left: 10px;
+}
+#regbutton{
+  width: 48%;
+  padding: 10px;
+  border:1px solid #FFFFFF;
+  color:#FFFFFF;
+}
+#loginbutton {
+  width: 48%;
+  padding: 10px;
+  float:right;
+  border:1px solid #FFFFFF;
+  color:#FFFFFF;
+}
+
+.tapArea {
+  position: fixed;
+  width: 100%;
+  background-color: white;
+  bottom: 0px;
+  opacity:0.93;
+  box-shadow: 3px 3px 3px #000;
+  font-family: 'Arial Narrow', sans-serif;
+  display: none;
+}
+
+#email4login {
+  margin-top :10px; 
+}
+#name4reg {
+  margin-top :10px; 
+}
+input.normalinput {
+  border-top :0;
+  border-left :0;
+  border-right :0;
+  border-bottom: 1px solid rgb(232, 229, 229);
+}
+#forgotpassword {
+  font-size:14px;
+  color: rgb(155, 155, 155);
+  text-decoration: underline;
+  margin-bottom: 5px;
+}
+.normalSubmit {
+  padding: 10px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #313335;
+  border: 1px solid #313335;
+  color: white;
+}

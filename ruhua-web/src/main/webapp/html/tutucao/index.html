@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <title>吐槽墙</title>
+    <link href="css/flat-ui.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/jquery.cxcolor.css">
+    <script src="js/jquery-1.9.1.min.js"></script>
+    <script src="js/jquery.cxcolor.min.js"></script>
+    <style>
+        body {
+            margin-top:0;margin-left:auto;
+            filter:"progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale')";
+            -moz-background-size:100% 100%;
+            background-size:100%;
+        }
+        #canvas { position: absolute; top: 0px; left: 0px; }
+        #marqueeArea {
+            z-index:9999;
+            position: fixed;
+            width:100%;
+            font-family: "黑体";
+        }
+        #comments {
+            padding-top:5px;
+            padding-bottom:5px;
+            position: absolute;
+            width: 100%;
+            background-color: white;
+            bottom: 0px;
+            opacity:0.97;
+            text-align: center;
+            box-shadow: 3px 3px 3px #000;
+            font-family: 'Arial Narrow', sans-serif;
+        }
+    </style>
+    <!-- Unless using the CDN hosted version, update the URL to the Flash SWF -->
+    <script>
+        function GetRandomNum(Min,Max)
+        {
+            var Range = Max - Min;
+            var Rand = Math.random();
+            return(Min + Math.round(Rand * Range));
+        }
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURIComponent(r[2]); return null;
+        }
+        var getHostUrl = function(){
+            var __url__ = window.location.protocol + "//" ;
+            __url__ += window.location.hostname ;
+            __url__ += !!window.location.port ? ":"+ window.location.port : "";
+            __url__ += "";
+            return __url__;
+        };
+        var wHeight = 0;
+        var areaSelect = function() {
+            $(".selectList").each(function(){
+                var url = "area.json";
+                var areaJson;
+                var temp_html;
+                var oProvince = $(this).find(".province");
+                var oCity = $(this).find(".area");
+                var oDistrict = $(this).find(".layer");
+                //初始化省
+                var province = function(){
+                    $.each(areaJson,function(i,province){
+                        temp_html+="<option value='"+province.p+"'>"+province.p+"</option>";
+                    });
+                    oProvince.html(temp_html);
+                    city();
+                };
+                //赋值市
+                var city = function(){
+                    temp_html = ""; 
+                    var n = oProvince.get(0).selectedIndex;
+                    $.each(areaJson[n].c,function(i,city){
+                        temp_html+="<option value='"+city.ct+"'>"+city.ct+"</option>";
+                    });
+                    oCity.html(temp_html);
+                    district();
+                };
+                //赋值县
+                var district = function(){
+                    temp_html = ""; 
+                    var m = oProvince.get(0).selectedIndex;
+                    var n = oCity.get(0).selectedIndex;
+                    if(typeof(areaJson[m].c[n].d) == "undefined"){
+                        oDistrict.css("display","none");
+                    }else{
+                        oDistrict.css("display","inline");
+                        $.each(areaJson[m].c[n].d,function(i,district){
+                            temp_html+="<option value='"+district.dt+"'>"+district.dt+"</option>";
+                        });
+                        oDistrict.html(temp_html);
+                    };
+                };
+                //选择省改变市
+                oProvince.change(function(){
+                    city();
+                    changeUrl();
+                    switchBack();
+                });
+                //选择市改变县
+                oCity.change(function(){
+                    district();
+                    changeUrl();
+                    switchBack();
+                });
+                oDistrict.change(function() {
+                    changeUrl();
+                });
+                //获取json数据
+                $.getJSON(url,function(data){
+                    areaJson = data;
+                    province();
+                    initUrlParam();
+                });
+            });
+        }
+        var switchBack = function() {
+            //修改图片背景
+            var area = $(".area").find("option:selected").text();
+            if(area == '益园') {
+                $("body").css("background","url(images/yy.jpg)");
+            } else if(area == '朝林广场') {
+                $("body").css("background","url(images/zl.jpg)");
+            } else if(area == '北辰世纪中心') {
+                $("body").css("background","url(images/bc.jpg)");
+            } else if(area == '西部智谷D区2栋') {
+                $("body").css("background","url(images/cd.jpg)");
+            }  else if(area == '昂立信息园') {
+                $("body").css("background","url(images/sy.jpg)");
+            } else {
+                $("body").css("background","#B4B4B4");
+            }
+            $("body").css("background-size","100% ");
+        }
+        var changeUrl = function() {
+            var changeUrl = getHostUrl() + "/html/tutucao/index.html?";
+            changeUrl += "p=" + $(".province").find("option:selected").text()
+                    + "&a=" + $(".area").find("option:selected").text()
+                    + "&l=" + $(".layer").find("option:selected").text() ;
+            var state = {
+                title: "吐槽墙",
+                url: changeUrl
+            };
+            window.history.pushState(state, document.title, changeUrl);
+        }
+        var initUrlParam = function() {
+            var province = getQueryString("p");
+            var area = getQueryString("a");
+            var layer = getQueryString("l");
+            $(".province").find("option[value='"+province+"']").attr("selected",true);
+            $(".province").change();
+            $(".area").find("option[value='"+area+"']").attr("selected",true);
+            $(".area").change();
+            $(".layer").find("option[value='"+layer+"']").attr("selected",true);
+            $(".layer").change();
+        }
+        $(function(){
+            var defaultcolor = "#" + localStorage.getItem("color");
+            if(localStorage.getItem("color") == null) {
+                defaultcolor = "#000";
+            }
+            $("#commentInput").focus();
+            $("#color_d").cxColor({
+                color:defaultcolor
+            },function(api){
+                $(this).bind('change', function(){
+                    $("#color_d").css("color",api.color());
+                    localStorage.setItem("color",api.color().substr(1,6));
+                });
+            });
+            areaSelect();
+            wHeight = window.screen.availHeight;
+            initWorker();
+            switchBack();
+            var localSpeed = localStorage.getItem("speed");
+            var size = localStorage.getItem("size");
+            $("#speed").find("option[value='"+ localSpeed +"']").attr("selected",true);
+            $("#size").find("option[value='"+ size +"']").attr("selected",true);
+            $("#speed").change(function() {
+                localStorage.setItem("speed",$(this).val());
+            });
+            $("#size").change(function() {
+                localStorage.setItem("size",$(this).val());
+            });
+        });
+        //初始化调用方法
+        function initWorker(){
+            /*window.setInterval(function () {
+                getChangesMsg();
+            }, 500);*/
+            var __url__ = "ws://" + window.location.hostname ;
+            __url__ += !!window.location.port ? ":"+ window.location.port : "";
+            __url__ += "/wsServlet";
+            var ws = new WebSocket(__url__);
+            ws.onopen = function(){
+            };
+            ws.onmessage = function(message){
+                var mess = message.data;
+                var color = "ffffff";
+                var setting = "";
+                if(mess.split(":").length > 1) {
+                    var address = mess.split(":")[0];
+                    var p = address.split("#")[0];
+                    var a = address.split("#")[1];
+                    var l = address.split("#")[2];
+                    var province = $("#province").val();
+                    var area = $("#area").val();
+                    var layer = $("#layer").val();
+                    if(p != province) {
+                        return;
+                    }
+                    if(area != '所有' && a != '所有' && area != a) {
+                        return;
+                    }
+                    if(layer != '所有' && l != '所有' && layer != l) {
+                        return;
+                    }
+                    mess = mess.split(":")[1];
+                    if(mess.split("^").length > 1) {
+                        setting = mess.split("^")[1];
+                        mess = mess.split("^")[0];
+                    }
+                }
+                var settingA = setting.split("#");
+                var speed = 15;
+                var size = 40;
+                if(settingA.length <= 1) {
+                } else {
+                    color = settingA[0];
+                    speed = settingA[1] == '超慢' ? 5 : (settingA[1] == '慢' ? 10 : (settingA[1] == '中' ? 15 : (settingA[1] == '快' ? 25 : (settingA[1] == '超快' ? 35 : 15))));
+                    size = settingA[2] == '超小' ? 30 : (settingA[2] == '小' ? 35 : (settingA[2] == '中' ? 40 : (settingA[2] == '大' ? 45 : (settingA[2] == '超大' ? 80 : 40))));
+                }
+                var msg = "<marquee behavior=\"scroll\" onfinish=\"$(this).remove();\" onMouseOut=\"this.start();\" onMouseOver=\"this.stop();\" loop=\"1\" scrollamount=\""+speed+"\" " +
+                        "style=\"position:fixed;width:100%;z-index:999;margin-top:"+GetRandomNum(0,wHeight-300)+"px;height:80px;\">"+
+                        "<span style=\"opacity:0.9;font-size:"+size+"px;color:#"+color+";\">"+mess+"</span>"+
+                        "</marquee>";
+                $("#marqueeArea").append(msg);
+            };
+            function postToServer(){
+                var province = $("#province").val();
+                var area = $("#area").val();
+                var layer = $("#layer").val();
+                ws.send(province + "#" + area + "#" + layer + ":" + $("#commentInput").val() + "^" + localStorage.getItem("color") + "#" + localStorage.getItem("speed") + "#" + localStorage.getItem("size"));
+                $("#commentInput").val("");
+            }
+            function closeConnect(){
+                ws.close();
+            }
+            $('#commentInput').bind('keypress',function(event){
+                if(event.keyCode == "13")
+                {
+                    postToServer();
+                }
+            });
+        }
+        var colors = ['red','blue','green','yellow','purple'];
+        var id = 1;
+        var getChangesMsg = function() {
+           /* var url = getHostUrl()+ "/danmu/getMsg";
+            $.get(url,
+                    null,
+                    function (data) {
+                        //处理消息变化
+                        if(data.data.length <= 0) {return;}
+                        var msgjson = data.data.split("###");
+                        var msg = "";
+                        var top = 0;
+                        for(var i=0;i<msgjson.length;i++) {
+                            msg = "<marquee id='"+(id++)+"' behavior=\"scroll\" onMouseOut=\"this.start();\" onMouseOver=\"this.stop();\" loop=\"1\" scrollamount=\""+GetRandomNum(10,20)+"\" " +
+                                    "style=\"position:fixed;width:100%;z-index:999;margin-top:"+GetRandomNum(0,wHeight-300)+"px;height:80px;\">"+
+                                    "<span style=\"opacity:0.9;font-size:"+GetRandomNum(30,80)+"px;color:"+colors[GetRandomNum(0,4)]+"\">"+msgjson[i]+"</span>"+
+                                    "</marquee>";
+                            $("#marqueeArea").append(msg);
+                        }
+                    }
+            );*/
+        };
+        setInterval(function() {
+            $("marquee").each(function() {
+                var left = $(this).scrollLeft() - $(this).find("span").text().length * 20;
+                if(left > 0) $(this).remove();
+            });
+        },10000);
+        setInterval(function() {
+            $.ajax({
+                type : 'get',
+                dataType : 'json',
+                url: getHostUrl() + "/tucao/getCount",
+                data:{
+                    p : $("#province").val(),
+                    a : $("#area").val(),
+                    l : $("#layer").val()
+                },
+                success: function (data, status, xhr) { //客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
+                    $("#count").text(data.all);
+                }
+            });
+        },1000);
+    </script>
+</head>
+<body>
+<div id="marqueeArea">
+    <!--<marquee id="0" behavior="scroll" onMouseOut="this.start();$(this).remove();" onMouseOver="this.stop();" loop="1" scrollamount="10" style="top:300px;">
+        <h1 style="color:red">只滚动一次</h1>
+    </marquee>-->
+</div>
+<div id="comments">  
+    <table style="width:100%;">
+        <tr>
+            <td width="30%" style="margin-left:50px;">
+                <div class="selectList">
+                    我在
+                    <select class="province" id="province">
+                        <option>请选择</option>
+                    </select>
+                    <select class="area" id="area">
+                        <option>请选择</option>
+                    </select>
+                    <select class="layer" id="layer">
+                        <option>请选择</option>
+                    </select>
+                </div>
+            </td>
+            <td width="40%">
+                <input id="commentInput" style="width:80%;" type="text" value="" placeholder="按回车发送" class="span3">
+            </td>
+            <td style="text-align:left;font-size: 12px;color: gray;">
+                颜色：
+                <input id="color_d" style="padding:0px;border-style: initial;background: 0;" type="text" class="input_cxcolor" readonly="">
+                速度：
+                <select class="speed" id="speed">
+                    <option value='超快'>超快</option>
+                    <option value='快'>快</option>
+                    <option value='中' selected>中</option>
+                    <option value='慢'>慢</option>
+                    <option value='超慢'>超慢</option>
+                </select>
+                大小：
+                <select class="size" id="size">
+                    <option value='超大'>超大</option>
+                    <option value='大'>大</option>
+                    <option value='中' selected>中</option>
+                    <option value='小'>小</option>
+                    <option value='超小'>超小</option>
+                </select>
+            </td>
+        </tr>
+    </table>  
+</div>
+<div id="guanggao" style="float: left;">
+    <img id="getqrcode" width="60px" height="60px" src="images/getqrcode.jpg">
+    <img width="60px" height="60px" src="images/ruhua.png">
+</div>
+<div style="float: right">
+    <span id="count" style="font-size: 22px;color:#ffff00;font-family: Georgia;">0</span>
+</div>
+<div id="cholder">
+    <canvas id="canvas"></canvas>
+</div>
+</body>
+</html>

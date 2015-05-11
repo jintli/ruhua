@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>编辑资料</title>
+
+    <!-- Sets initial viewport load and disables zooming  -->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+    <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!-- Include the compiled Ratchet CSS -->
+    <link href="css/ratchet.min.css" rel="stylesheet">
+    <link href="css/common.css" rel="stylesheet">
+    <link href="css/profile.css" rel="stylesheet">
+    <!-- Optionally, include either the iOS or Android theme -->
+    <!-- <link href="/css/ratchet-theme-ios.min.css" rel="stylesheet"> -->
+    <!-- Include the compiled Ratchet JS -->
+    <script src="js/ratchet.min.js"></script>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/jam.js"></script>
+    <script src="js/common.js"></script>
+    <script language="javascript" type="text/javascript">
+        var currentPicId = "";
+        $(function(){
+            $.ajax({
+                async: true,
+                type : 'get',
+                dataType : 'json',
+                timeout : 10000,
+                url: baseFn.url + "/profile/test",  // 跨域URL
+                success: function (data, status, xhr) { //客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
+                    if(data.retCode == 0) {
+                        var userInfo = data.data;
+                        $("#name").text(userInfo.userName);
+                        $("#age").text(userInfo.age + "岁");
+                        $("#community").text(userInfo.community);
+                        //设置里的
+                        var pic = userInfo.pic;
+                        if(pic != null) {
+
+                        }
+                        //标签
+                        var lable = userInfo.lable;
+                        if(lable != null) {
+                            var lableJson = JSON.parse(lable);
+                            var ownerLableHtml = "";
+                            for(var i=0;i<lableJson.length;i++) {
+                                ownerLableHtml += "<span class=\"badge badge-color-"+GetRandomNum(1,13)+"\">" + lableJson[i].k
+                                        + "</span> <a class=\"badge-choose_minus\"><img class=\"badge-plus-action\" src=\"img/operate/minus.png\"></a>";
+                            }
+                            $("#onwerLable").append(ownerLableHtml);
+                        }
+                    } else {
+                        toast(data.retMsg,3000);
+                    }
+                },
+                error : function(xhr, errorType, error) {
+                    alert("失败");
+                },
+                complete: function(XMLHttpRequest, textStatus){
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+
+<div class="content">
+</div>
+</body>
+</html>

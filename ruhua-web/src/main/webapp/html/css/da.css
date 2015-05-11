@@ -1,0 +1,68 @@
+div#left {
+    float: left;
+}
+div#right {
+    float: right;
+    margin-left:10px;
+    width:70%;
+}
+div#left img {
+	border-radius:50%;
+	border: solid 2px #FF64F7;
+}
+div#profile {
+	text-align: center;
+	font-size: 10px;
+}
+div#name {
+	font-size: 14px;
+	font-weight: bold;
+}
+div#time {
+	margin-top: 5px;
+	font-size: 10px;
+	color: rgb(150, 150, 150);
+}
+.slider {
+	background-color: #FFF;
+}
+#main {
+	float: left;
+	height: auto;
+	width: auto;
+	margin:10px;
+    max-height:90px;
+}
+
+.slide-text {
+	position: relative;
+	margin-top: -30px;
+	float: right;
+}
+
+.loveArea {
+	position: fixed;
+	width: 100%;
+	background-color: white;
+	bottom: 55px;
+	opacity: 0.6;
+	font-family: 'Arial Narrow', sans-serif;
+    display:none;
+    z-index:999;
+}
+
+#likeButton{
+  width: 48%;
+  padding: 10px;
+  border:1px solid #FFFFFF;
+  color:#FFFFFF;
+  background-color: rgb(253, 125, 147);
+}
+#dislikeButton {
+  width: 48%;
+  padding: 10px;
+  float:right;
+  border:1px solid #FFFFFF;
+  background-color: rgb(107, 106, 106);
+  color:#FFFFFF;
+}

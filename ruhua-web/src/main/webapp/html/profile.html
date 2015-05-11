@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>编辑资料</title>
+
+    <!-- Sets initial viewport load and disables zooming  -->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+    <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!-- Include the compiled Ratchet CSS -->
+    <link href="css/ratchet.min.css" rel="stylesheet">
+    <link href="css/common.css" rel="stylesheet">
+    <link href="css/profile.css" rel="stylesheet">
+    <!-- Optionally, include either the iOS or Android theme -->
+    <!-- <link href="/css/ratchet-theme-ios.min.css" rel="stylesheet"> -->
+    <!-- Include the compiled Ratchet JS -->
+    <script src="js/ratchet.min.js"></script>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/touch.js"></script>
+    <script src="js/jam.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/pic.js"></script>
+    <script language="javascript" type="text/javascript">
+        var currentPicId = "";
+        $(function(){
+          $.ajax({
+              async: true,
+              type : 'get',
+              dataType : 'jsonp',
+              jsonp : 'jsoncallback', //默认callback
+              timeout : 10000,
+              url: baseFn.url + "/profile/queryUserProfile.json?callback=?",  // 跨域URL
+              success: function (data, status, xhr) { //客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
+                  if(data.retCode == 0) {
+                      var userInfo = data.data;
+                      $("#name").text(userInfo.userName);
+                      if(userInfo.age > 0) {
+                          $("#name").after("<span id=\"age\" class=\"badge\">"+userInfo.age+"岁</span>"
+                          +"<span id=\"community\" class=\"badge\">"+userInfo.community+"</span>");
+                      }
+                      //设置里的
+                      var pic = userInfo.pic;
+                      if(pic != null) {
+                          var picJson = JSON.parse(pic);
+                          var picHtml = "<a class=\"pic-operate\"><img src=\"img/operate/minus.png\"></a>" +
+                                  "<img class=\"profileimg\" width=\"100%\" src=\"imgsrc\">";
+                          var nopicHtml = "<img class=\"picchoosebuttong\" width=\"100%\" src=\"img/operate/pic.jpg\">" +
+                                  "<input class=\"picinput\" type=\"file\" accept=\"image/gif,image/jpeg\"/>";
+                          var content = nopicHtml;
+                          if(picJson.pic001 != null) {
+                              content = picHtml.replace("imgsrc",picJson.pic001).replace("profileimg","headProfileImg");
+                          } else content = nopicHtml;
+                          $("#pic001").html(content);
+                          if(picJson.pic002 != null) {
+                              content = picHtml.replace("imgsrc",picJson.pic002);
+                          }  else content = nopicHtml;
+                          $("#pic002").html(content);
+                          if(picJson.pic003 != null) {
+                              content = picHtml.replace("imgsrc",picJson.pic003);
+                          } else content = nopicHtml;
+                          $("#pic003").html(content);
+                          if(picJson.pic004 != null) {
+                              content = picHtml.replace("imgsrc",picJson.pic004);
+                          } else content = nopicHtml;
+                          $("#pic004").html(content);
+                          if(picJson.pic005 != null) {
+                              content = picHtml.replace("imgsrc",picJson.pic005);
+                          } else content = nopicHtml;
+                          $("#pic005").html(content);
+                          if(picJson.pic006 != null) {
+                              content = picHtml.replace("imgsrc",picJson.pic006);
+                          } else content = nopicHtml;
+                          $("#pic006").html(content);
+                      }
+                      //标签
+                      var lable = userInfo.lable;
+                      if(lable != null) {
+                          var lableJson = JSON.parse(lable);
+                          var ownerLableHtml = "";
+                          for(var i=0;i<lableJson.length;i++) {
+                              ownerLableHtml += "<span class=\"badge badge-color-"+GetRandomNum(1,13)+"\">" + lableJson[i].k
+                                      + "</span> <a class=\"badge-choose_minus\"><img class=\"badge-plus-action\" src=\"img/operate/minus.png\"></a>";
+                          }
+                          $("#onwerLable").append(ownerLableHtml);
+                      }
+                  } else {
+                      toast(data.retMsg,3000);
+                  }
+              },
+              error : function(xhr, errorType, error) {
+                  alert("失败");
+              },
+              complete: function(XMLHttpRequest, textStatus){
+              }
+          });
+
+          $(".badge-choose_add").live("tap",function() {
+              var badge = $(this).prev().text();
+              addLable(badge);
+          });
+          $(".badge-choose_minus").live("tap",function() {
+              $(this).prev().remove();
+              $(this).remove();
+          });
+          $("#custome_lable_add").live("tap",function() {
+              var customeLable = $("#custome_lable_input").val();
+              addLable(customeLable);
+              $("#custome_lable_input").val("");
+          });
+          $(".picchoosebuttong").live("tap",function() {
+              $(this).next().click();
+              currentPicId = $(this).parent().attr("id");
+          });
+          $(".picinput").live("change",function() {
+              $("#fixPicModel").addClass("active");
+              var file = this.files[0];
+              previewInImage(file);
+          });
+            $("#finishFixButton").live("tap",function() {
+                var imgData = _getCutImageData();
+                var frm = document.forms["picsubmitForm"];
+                var ifm = document.getElementById("picsubmitFrame");
+                $("#picLoc").val(currentPicId);
+                $("#imgData").val(imgData);
+                frm.action = baseFn.url + "/profile/saveUserPic.json";
+                frm.target = "picsubmitFrame";
+                frm.submit();
+                ifm.onload = function(){
+                    var str = ifm.contentWindow;
+                    ifm.src = "about:blank";
+                    ifm.onload = null;
+                    var imgclass = "profileimg";
+                    if(currentPicId == "pic001") imgclass = "headProfileImg";
+                    var imgInputHtml = "<a class=\"pic-operate\"><img src=\"img/operate/minus.png\"></a> " +
+                            "<img class=\""+imgclass+"\" width=\"100%\" src=\"" + imgData + "\">";
+                    $("#" + currentPicId).html(imgInputHtml);
+                    $("#fixPicModel").removeClass("active");
+                }
+                /*var imgInputHtml = "<a class=\"pic-operate\"><img src=\"img/operate/minus.png\"></a> " +
+                        "<img width=\"100%\" src=\"" + imgData + "\">";
+                $("#" + currentPicId).html(imgInputHtml);
+                $("#fixPicModel").removeClass("active");*/
+            });
+            $(".pic-operate").live("tap",function() {
+                currentPicId =  $(this).parent().attr("id");
+                $.ajax({
+                    async: true,
+                    type : 'get',
+                    dataType : 'jsonp',
+                    jsonp : 'jsoncallback', //默认callback
+                    data : {
+                       picLoc : currentPicId
+                    },
+                    timeout : 10000,
+                    url: baseFn.url + "/profile/removeUserPic.json?callback=?",  // 跨域URL
+                    success: function (data, status, xhr) { //客户端jquery预先定义好的callback函数，成功获取跨域服务器上的json数据后，会动态执行这个callback函数
+                        if(data.retCode == 0) {
+                            $("#" + currentPicId).html("<img class=\"picchoosebuttong\" width=\"100%\" src=\"img/operate/pic.jpg\">"+
+                                "<input class=\"picinput\" type=\"file\" accept=\"image/gif,image/jpeg\"/>");
+                        } else {
+                            toast(data.retMsg,3000);
+                        }
+                    },
+                    error : function(xhr, errorType, error) {
+                        alert("失败");
+                    },
+                    complete: function(XMLHttpRequest, textStatus){
+                    }
+                });
+            });
+            $("#finishEditProfile").live("tap",function() {
+                var lable = [];
+                //保存lable
+                $("#onwerLable").find("span").each(function() {
+                    var kJson = {k:$(this).text()};
+                    lable.push(kJson);
+                });
+                getData("/profile/updateUserLable.json",{lable: JSON.stringify(lable)},function(data) {
+                    location.href = "me.html";
+                });
+            });
+      });
+      var addLable = function(addBadge) {
+          if(addBadge.trim().length <=0) return;
+          var spans = $("#onwerLable").find("span.badge");
+          var hasBadge = false;
+          spans.each(function() {
+              if($(this).text() == addBadge) {
+                  hasBadge = true;
+              }
+          });
+          if(!hasBadge) {
+              $("#onwerLable").append("<span class=\"badge badge-color-"+GetRandomNum(1,13)+"\">" + addBadge
+                      + "</span> <a class=\"badge-choose_minus\"><img class=\"badge-plus-action\" src=\"img/operate/minus.png\"></a>");
+          }
+      }
+      var returnMainPage = function() {
+          $("#fixPicModel").removeClass("active");
+          $(".picinput").val("");
+          $("#imgPreview").attr("src","");
+      }
+    </script>
+  </head>
+  <body>
+    <!-- Make sure all your bars are the first things in your <body> -->
+    <header class="bar bar-nav">
+      <a class="btn pull-right" id="finishEditProfile">完成</a>
+      <h1 class="title">编辑资料</h1>
+        <a class="btn pull-left" href="javascript:location.href = 'me.html'">返回</a>
+    </header>
+
+    <div class="content">
+        <div id="picArea">
+            <table>
+                <tr>
+                    <td rowspan="2" colspan="2">
+                        <div id="pic001">
+                            <img class="picchoosebuttong" width="100%" src="img/operate/pic.jpg">
+                            <input class="picinput" type="file" accept="image/gif,image/jpeg"/>
+                        </div>
+                    </td>
+                    <td>
+                        <div id="pic002">
+                            <img class="picchoosebuttong" width="100%" src="img/operate/pic.jpg">
+                            <input class="picinput" type="file" accept="image/gif,image/jpeg"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="pic003">
+                            <img class="picchoosebuttong" width="100%" src="img/operate/pic.jpg">
+                            <input class="picinput" type="file" accept="image/gif,image/jpeg"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="pic004">
+                            <img class="picchoosebuttong" width="100%" src="img/operate/pic.jpg">
+                            <input class="picinput" type="file" accept="image/gif,image/jpeg"/>
+                        </div>
+                    </td>
+                    <td>
+                        <div id="pic005">
+                            <img class="picchoosebuttong" width="100%" src="img/operate/pic.jpg">
+                            <input class="picinput" type="file" accept="image/gif,image/jpeg"/>
+                        </div>
+                    </td>
+                    <td>
+                        <div id="pic006">
+                            <img class="picchoosebuttong" width="100%" src="img/operate/pic.jpg">
+                            <input class="picinput" type="file" accept="image/gif,image/jpeg"/>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="badgeArea">
+            <div id="hadBadge">
+                <span id="name" class="badge"></span>
+                <div id="onwerLable">
+                </div>
+            </div>
+            <div id="chooseBadge">
+                <span class="badge badge-color-1">本科</span> <a class="badge-choose_add"><img class="badge-plus-action" src="img/operate/plus.png"></a>
+                <span class="badge badge-color-4">美食</span> <a class="badge-choose_add"><img class="badge-plus-action" src="img/operate/plus.png"></a>
+                <span class="badge badge-color-7">歌神</span> <a class="badge-choose_add"><img class="badge-plus-action" src="img/operate/plus.png"></a>
+                <span class="badge badge-color-9">影迷</span> <a class="badge-choose_add"><img class="badge-plus-action" src="img/operate/plus.png"></a>
+                <span class="badge badge-color-7">周杰伦</span> <a class="badge-choose_add"><img class="badge-plus-action" src="img/operate/plus.png"></a>
+            </div>
+            <div id="addBadge">
+                <input id="custome_lable_input" style="width: auto;" type="text" placeholder="自定义标签">
+                <a id="custome_lable_add"><img style="opacity: 0.5;margin-left: -20px;" src="img/operate/plus.png"></a>
+            </div>
+        </div>
+    </div>
+    <div id="fixPicModel" class="modal">
+        <header class="bar bar-nav">
+            <a class="btn pull-left" onclick="returnMainPage();">返回</a>
+            <h1 class="title">修正图片</h1>
+            <a id="finishFixButton" class="btn pull-right btn-disable">
+                完成
+            </a>
+        </header>
+        <div class="content" id="fixPicContent">
+            <div id="wrapper" style="">
+
+                <div id="component_box" style="position: relative; width: 100%; ">
+                    <div id="tipBox" style="display: none;">
+                        <img style="width: 100%" src=""/>
+                    </div>
+                    <div id="mainCutter" style="overflow: hidden; display: none;">
+                        <img id="imgPreview" />
+                        <div id="cutBox" style=" position:absolute; width: 200px; height: 200px; opacity: 0.5; background: gray;"></div>
+                    </div>
+                </div>
+                <!--画布-->
+                <canvas id="cropper" style=" display:none;border:1px solid red; width: 100%; height: 100%;" ></canvas>
+            </div>
+            <div style="position: fixed;bottom:30px;width:100%;">
+                <!--调整用slider-->
+                <div id="processBar" style=" width:100%; height: 3px; background: dimgrey;margin-left:auto;margin-right:auto;">
+                    <div id="processPoint" style="background: url(img/horizSlider.png); width: 18px; height: 20px; position: absolute;left: 0;top: 0;margin-top: 3px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form method="post" id="picsubmitForm" name="picsubmitForm">
+            <input type="hidden" name="picLoc" id="picLoc" value="" />
+            <input type="hidden" name="imgData" id="imgData" value="" />
+        </form>
+        <iframe id="picsubmitFrame" name="picsubmitFrame" width="1" height="1" style="display:none"></iframe>
+    </div>
+  </body>
+</html>

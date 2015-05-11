@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>约会</title>
+
+    <!-- Sets initial viewport load and disables zooming  -->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+    <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!-- Include the compiled Ratchet CSS -->
+    <link href="css/ratchet.min.css" rel="stylesheet">
+    <link href="css/common.css" rel="stylesheet">
+    <link href="css/ratchet-theme-ios.min.css" rel="stylesheet">
+    <link href="css/yue.css" rel="stylesheet">
+    <!-- Optionally, include either the iOS or Android theme -->
+    <!-- <link href="/css/ratchet-theme-ios.min.css" rel="stylesheet"> -->
+    <!-- Include the compiled Ratchet JS -->
+    <script src="js/ratchet.min.js"></script>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/touch.js"></script>
+    <script src="js/mobiscroll/mobiscroll.zepto.js" type="text/javascript"></script>
+    <script src="js/mobiscroll/mobiscroll.core.js" type="text/javascript"></script>
+    <script src="js/mobiscroll/mobiscroll.scroller.js" type="text/javascript"></script>
+    <script src="js/mobiscroll/mobiscroll.datetime.js" type="text/javascript"></script>
+    <script src="js/mobiscroll/mobiscroll.i18n.zh.js" type="text/javascript"></script>
+    <link href="css/mobiscroll/mobiscroll.scroller.css" rel="stylesheet" type="text/css" />
+    <link href="css/mobiscroll/mobiscroll.scroller.sense-ui.css" rel="stylesheet" type="text/css" />
+    <script src="js/jam.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/iscroll.js"></script>
+    <script>
+        var myScroll;
+        var listonnow = 0;
+        var matchMapHeightAndScroll = function() {
+            $("#wrapper").css({"top":"215px"});
+            $("#wrapper").css({"width":$("#whereandwhen").css('width')});
+        };
+        /**
+         * 初始化iScroll控件
+         */
+        function loaded() {
+            myScroll = new iScroll('wrapper', {
+                scrollbarClass: 'myScrollbar', /* 重要样式 */
+                useTransition: false, /* 此属性不知用意，本人从true改为false */
+                snap:false,checkDOMChange:true,vScrollbar:true,
+                onBeforeScrollStart : function(e) {
+                    var nodeType = e.explicitOriginalTarget ? e.explicitOriginalTarget.nodeName.toLowerCase() : (e.target ? e.target.nodeName.toLowerCase() : '');
+                    if(nodeType != 'select' && nodeType != 'option' && nodeType != 'input' && nodeType != 'textarea'){
+                        e.preventDefault();
+                    }
+                },
+                onRefresh: function () {
+                }
+            });
+            setTimeout(function () { myScroll.refresh(); }, 2000);
+        }
+        //初始化绑定iScroll控件
+        document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+        document.addEventListener('DOMContentLoaded', loaded, false);
+    </script>
+    <script language="javascript" type="text/javascript">
+        $$(function(){
+            $('#date_user_time').scroller('destroy').scroller({
+                preset: 'datetime',
+                minDate: new Date(),
+                maxDate: new Date(new Date().getTime() + 1000*3600*24*10),
+                lang: 'zh'
+            });
+            getData("/date/queryCanDateUserInfo.json",null,function(data) {
+                if(data.retCode == 0) {
+                    $("#floater").hide();
+                    $("#empty-da").hide();
+                    var dawodeHtml = "";
+                    var dateyou = data.data;
+                    for(var i=0;i<dateyou.length;i++) {
+                        var status = dateyou[i].status;
+                        var inviteButton = "";
+                        var statushtml = "";
+                        if(status == -1) {
+                            inviteButton = "<a  href=\"#yaoqingModal\" class=\"btn btn-primary invite-init\">邀请</a>";
+                        }
+                        if(status != -1) {
+                            statushtml = status == 0? "对待对方回复" : (status == 1 ? "对方已同意" : (status == 2 ?
+                                    "对方已拒绝" : ""))
+                        }
+                        dawodeHtml += "<li class=\"table-view-cell media\" id=\"datelist-" + i + "\">"+
+                        "<img class=\"media-object pull-left dawodehead\" width=65 height=65 src=\""+dateyou[i].headPic+"\">"+
+                        "<div class=\"media-body\"><span class='username'>"+
+                                dateyou[i].userName+
+                        "</span><span class='status'>"+statushtml+"</span><p class=\"community\">"+dateyou[i].community+"</p>"+
+                        "<span class=\"dashantime\"><span class='age'>"+dateyou[i].age+"</span>岁</span>"+
+                        "</div>"+
+                                inviteButton +
+                        "<input class='email' type='hidden' value='"+dateyou[i].email+"'/>" +
+                                "<input class='lng' type='hidden' value='"+dateyou[i].lng+"'/>" +
+                                "<input class='lat' type='hidden' value='"+dateyou[i].lat+"'/></li>";
+                    }
+                    $("#candateuserul").append(dawodeHtml);
+                } else if(data.retCode == 403) {
+                    $("#empty-da-img").attr("src","img/operate/nolikeme.gif");
+                    $("#empty-da-info").text("梦里花落知多少");
+                }
+            });
+            $(".invite-init").live("tap",function() {
+                listonnow = $(this).parent().attr("id");
+                var email = $(this).parent().find("input.email")[0].value;
+                var headPic = $(this).parent().find("img")[0].src;
+                var community = $(this).parent().find("p.community")[0].textContent;
+                var age = $(this).parent().find("span.age")[0].textContent;
+                var name = $(this).parent().find("span.username")[0].textContent;
+                var lng = $(this).parent().find("input.lng")[0].value;
+                var lat = $(this).parent().find("input.lat")[0].value;
+                $("#headPic").attr("src",headPic);
+                $("#username").text(name);
+                $("#date_user_age").text(age);
+                $("#date_user_community").text(community);
+                $("#head-table-lng").val(lng);
+                $("#head-table-lat").val(lat);
+                $("#head-table-email").val(email);
+            });
+            $("#submitButton").live("tap",function() {
+                var type = $(".title .name").text();
+                if(type == "去干嘛") {
+                    toast("请选择约会目的",1000);
+                    return;
+                }
+                var time = $("#date_user_time").val();
+                if(time == null || time == '') {
+                    toast("请选择约会时间",3000);
+                    return;
+                }
+                var loc = $("#date_user_loc").val();
+                if(loc == null || loc == '') {
+                    toast("请选择约会地点",3000);
+                    return;
+                }
+                var lng = $("#date_loc_lng").val();
+                var lat = $("#date_loc_lat").val();
+                var typeint = type =='吃饭'? 1 : (type == '看电影'? 2 : (type=='K歌' ? 3 : -1))
+                getData("/date/insertDatePerson.json",
+                        {
+                            type:typeint,
+                            dateEmail:$("#head-table-email").val(),
+                            time : time,
+                            loc:loc,
+                            lng:lng,
+                            lat:lat
+                        },function(data) {
+                            if(data.retCode == 0) {
+                                toast("邀请成功，耐心等待对方回复",2000);
+                                setTimeout(function() {
+                                    $("#yaoqingModal").removeClass("active");
+                                    /*$("#dynymicCommunity").text(community);
+                                    $("#setting-community").val(community);*/
+                                    $("#" + listonnow).find("a").remove();
+                                    $("#" + listonnow).find(".status")[0].textContent = "等待对方回复";
+                                },2000);
+                            }
+                });
+            });
+            $("#head-table-a").live("tap",function() {
+                getData("/recommend/queryRecommendInfo.json",{email:$("#head-table-email").val()},function(data) {
+                    if(data.retCode == 0) {
+                        $("#userDetailContent").empty();
+                        var userInfo = data.data;
+                        var badgeHtml = "";
+                        //标签
+                        var lable = userInfo.lable;
+                        if(lable != null) {
+                            var lableJson = JSON.parse(lable);
+                            for(var i=0;i<lableJson.length;i++) {
+                                badgeHtml += "<span class=\"badge badge-color-"+GetRandomNum(1,13)+"\">" + lableJson[i].k
+                                        + "</span>";
+                            }
+                        }
+                        var sliderHtml = "<div class=\"slider\" id=\"mySlider\">" +
+                                "<div class=\"slide-group\">";
+                        var pic = userInfo.pic;
+                        if(pic != null) {
+                            var picJson = JSON.parse(pic);
+                            var commonSliderHtml = "<div class=\"slide\">"+
+                                    "<img width=\"100%\" src=\"imgsrc\">"+
+                                    "corner</div>";
+                            if(picJson.pic002 != null) {
+                                sliderHtml += commonSliderHtml.replace("imgsrc",picJson.pic002);
+                            }
+                            if(picJson.pic003 != null) {
+                                sliderHtml += commonSliderHtml.replace("imgsrc",picJson.pic003);
+                            }
+                            if(picJson.pic004 != null) {
+                                sliderHtml += commonSliderHtml.replace("imgsrc",picJson.pic004);
+                            }
+                            if(picJson.pic005 != null) {
+                                sliderHtml += commonSliderHtml.replace("imgsrc",picJson.pic005);
+                            }
+                            if(picJson.pic006 != null) {
+                                sliderHtml += commonSliderHtml.replace("imgsrc",picJson.pic006);
+                            }
+                            sliderHtml = sliderHtml.substr(0,sliderHtml.length - 12) + "</div>";
+                            sliderHtml = sliderHtml.replace(/corner/g,"<span class=\"slide-text\">" +
+                                    "<span class=\"icon icon-left-nav\"></span>" +
+                                    "</span>");
+                        }
+                        sliderHtml += "</div></div>";
+                        var mainHtml = "<div id=\"main\"><div id=\"left\"><img width=80 height=80 src=\""+JSON.parse(userInfo.pic).pic001+"\" /></div>"+
+                                "<div id=\"right\">" +
+                                "<div id=\"left_1\" class=\"left_div\"> "+
+                                "<span class=\"badge\">"+userInfo.userName+"</span> <input type='hidden' id='email' value=\""+userInfo.email+"\"/>"+
+                                "<span class=\"badge\">"+userInfo.age+"</span> "+
+                                "<span class=\"badge\">"+userInfo.community+"</span> "+
+                                "</div>"+
+                                "<div id=\"left_2\" class=\"left_div\"> "+
+                                badgeHtml +
+                                "</div> "+
+                                "</div> "+
+                                "</div>" + sliderHtml + "</div>";
+                        $("#userDetailContent").append(mainHtml);
+                        var rightHeight = $(".content").width() - 30 - $("#left").width();
+                        $("#right").css({width:rightHeight});
+                    }
+                });
+            });
+            $(".locationlink").live("tap",function() {
+                $(".locationlink").removeClass("choseStyle");
+                $(this).addClass("choseStyle");
+                $("#date_user_loc").val($(this).find(".shopname")[0].textContent);
+                $("#date_loc_lng").val($(this).find(".shoplng")[0].value);
+                $("#date_loc_lat").val($(this).find(".shoplat")[0].value);
+            });
+        });
+        var dowhat = function(type) {
+            $("#gowhere").css({"display":"none"});
+            $(".backdrop").remove();
+            $(".title .name").text(type);
+            //业务逻辑 先生成时间选择框
+            $("#surroundedDestination").empty();
+            var typeint = type =='吃饭'? 1 : (type == '看电影'? 2 : (type=='K歌' ? 3 : -1))
+            getData("/location/queryDestinationByType.json",{type : typeint,lng:$("#head-table-lng").val(),lat:$("#head-table-lat").val()},
+            function(data) {
+                 if(data.retCode == "0") {
+                     $("#surroundedDestination").empty();
+                     var poiList = data.data;
+                     var destination = "";
+                     for(var i=0;i<poiList.length;i++) {
+                         var junjia = "";
+                         if(poiList[i].price != null && poiList[i].price != '') {
+                             junjia = "<span style=\"\">均价：￥"+poiList[i].price+"</span> ";
+                         }
+                         destination += "<li class=\"table-view-cell media\">"+
+                                 "<a class=\"navigate-right locationlink\"> "+
+                                 "<div class=\"media-body\">   "+
+                                 "<span class=\"shopname\">"+poiList[i].name+"</span>"+
+                                 "<span style='font-size:0.5em;color:gray;display:block;'>距您" + poiList[i].dis4u + " 距TA" + poiList[i].dis4ta +" " + junjia + "</span>" +
+                                 "<p class=\"address\">"+poiList[i].address+"</p> "+
+                                 "<input type=\"hidden\" class=\"shoplng\" value='"+poiList[i].coordinate.lng+"'/> "+
+                                 "<input type=\"hidden\" class=\"shoplat\" value='"+poiList[i].coordinate.lat+"'/>"+
+                                 "</div>"+
+                                 "</a> "+
+                                 "</li>";
+                     }
+                     $("#surroundedDestination").append(destination);
+                     myScroll.refresh();
+                 }
+            });
+        }
+    </script>
+</head>
+<body>
+<!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
+<div class="content">
+    <div id="floater"></div>
+    <div id="empty-da">
+        <div><img id="empty-da-img" class="empty-da-img" src="img/operate/loading.gif"/> </div>
+        <span id="empty-da-info" class="empty-da-info">寻觅中，请稍后...</span>
+    </div>
+    <ul class="table-view" id="candateuserul">
+
+    </ul>
+    <nav class="bar bar-tab">
+        <a class="tab-item" onclick="location.href='da.html'">
+            <span class="icon icon-sound2"></span>
+            <span class="tab-label">搭讪</span>
+        </a>
+        <a class="tab-item active" href="#">
+            <span class="icon icon-forward"></span>
+            <span class="tab-label">约会</span>
+        </a>
+        <a class="tab-item" onclick="location.href='me.html'">
+            <span class="icon icon-person"></span>
+            <span class="tab-label">我</span>
+        </a>
+    </nav>
+</div>
+<!-- 邀请 -->
+<div id="yaoqingModal" class="modal">
+    <header class="bar bar-nav">
+        <a href="#gowhere">
+            <h1 class="title">
+                <span class="name">去干嘛</span>
+                <span class="icon icon-caret"></span>
+            </h1>
+        </a>
+    </header>
+    <div id="gowhere" class="popover">
+        <ul class="table-view">
+            <li class="table-view-cell" onclick="dowhat('吃饭');" class="date_what">吃饭</li>
+            <li class="table-view-cell" onclick="dowhat('看电影');" class="date_what">看电影</li>
+            <li class="table-view-cell" onclick="dowhat('K歌');" class="date_what">K歌</li>
+        </ul>
+    </div>
+    <div class="content">
+        <ul id="haed-table" class="table-view">
+            <li class="table-view-cell media">
+                <a class="navigate-right" id="head-table-a" href="#userDetailModal">
+                    <img id="headPic" class="media-object pull-left dawodehead" width=65 height=65 src="">
+                    <div class="media-body">
+                        <span id="username"></span>
+                        <div class="dashantime" id="date_user_community"></div>
+                    </div>
+                    <input type="hidden" id="head-table-email"/>
+                    <input type="hidden" id="head-table-lng"/>
+                    <input type="hidden" id="head-table-lat"/>
+                    <span class="badge" id="date_user_age"></span>
+                </a>
+            </li>
+        </ul>
+        <form id="whereandwhen" class="input-group" style="">
+            <div class="input-row">
+                <label>时间</label>
+                <input id="date_user_time" type="text" placeholder="选择约会时间">
+            </div>
+            <div class="input-row">
+                <label>地点</label>
+                <input disabled id="date_user_loc" type="text" placeholder="选择约会地点">
+                <input type="hidden" id="date_loc_lng"/>
+                <input type="hidden" id="date_loc_lat"/>
+             </div>
+        </form>
+        <div id="wrapper">
+            <div id="scroller">
+                <ul class="table-view" id="surroundedDestination">
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Icons in standard bar fixed to the bottom of the screen -->
+    <div class="bar bar-standard bar-footer">
+        <a class="btn pull-left" href="#yaoqingModal">
+            取消
+        </a>
+        <a id="submitButton" class="btn pull-right">
+            发出邀请
+        </a>
+    </div>
+</div>
+<!-- user -->
+<div id="userDetailModal" class="modal">
+    <header class="bar bar-nav">
+        <a class="btn pull-left" href="#userDetailModal" id="returnfromuserdetail">返回</a>
+        <h1 class="title">用户详情</h1>
+    </header>
+    <div class="content" id="userDetailContent">
+    </div>
+</div>
+</body>
+</html>

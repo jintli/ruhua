@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd" >
+
+    <!--aop-->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <bean id="configProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath:important.properties</value>
+                <value>classpath:config.properties</value>
+            </list>
+        </property>
+    </bean>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+        <property name="ignoreResourceNotFound" value="true" />
+        <property name="properties" ref="configProperties"/>
+    </bean>
+    <context:component-scan base-package="com.ruhua" />
+    <import resource="dispatcher-servlet.xml"/>
+    <import resource="spring-config-datasource-dbcp.xml"/>
+    <!--spring 初始化的application context:SpringContextHolder.getBean( "beanExample" );-->
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="urlMap">
+            <map>
+                <entry key="/html/**" value="myResourceHandler" />
+            </map>
+        </property>
+        <property name="order" value="100000" />
+    </bean>
+    <bean id="myResourceHandler" name="myResourceHandler"
+          class="org.springframework.web.servlet.resource.ResourceHttpRequestHandler">
+        <property name="locations" value="/html/**" />
+        <property name="supportedMethods">
+            <list>
+                <value>GET</value>
+                <value>HEAD</value>
+                <value>POST</value>
+            </list>
+        </property>
+    </bean>
+</beans>

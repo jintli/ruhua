@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="DateMapper">
+
+    <resultMap id="UserInfoMap" type="com.ruhua.domain.user.UserInfo" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="username" property="userName" jdbcType="VARCHAR" />
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+        <result column="like_createtime" property="likeCreateTime" jdbcType="VARCHAR" />
+        <result column="lastmodified" property="lastmodified" jdbcType="TIMESTAMP" />
+        <result column="status" property="status" jdbcType="INTEGER" />
+        <result column="pic" property="pic" jdbcType="VARCHAR" />
+        <result column="lable" property="lable" jdbcType="VARCHAR" />
+        <result column="age" property="age" jdbcType="INTEGER" />
+        <result column="love" property="love" jdbcType="INTEGER" />
+        <result column="community" property="community" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="queryCanDateUserInfo" resultMap="UserInfoMap" parameterType="java.lang.String" >
+        SELECT recommend_like.email,user_setting.age,user_setting.lng,user_setting.lat,user.username,user_setting.community,user_profile.pic
+        FROM recommend_like, user_setting,user_profile,user
+        WHERE recommend_like.email = user_setting.email
+         AND recommend_like.email = user_profile.email
+         AND recommend_like.email = user.email
+        AND recommend_like.email IN
+        (SELECT like_email FROM recommend_like WHERE email = #{email,jdbcType=VARCHAR})
+        AND like_email = #{email,jdbcType=VARCHAR}
+        order by recommend_like.createtime
+    </select>
+    <insert id="insertDatePerson" parameterType="com.ruhua.domain.date.DateInfo">
+        insert into date (type,email,date_email,loc,lng,lat,datetime) values
+        (#{type,jdbcType=INTEGER},#{email,jdbcType=VARCHAR},#{dateEmail,jdbcType=VARCHAR},#{loc,jdbcType=VARCHAR}
+        ,#{lng,jdbcType=DOUBLE},#{lat,jdbcType=DOUBLE},#{datetime,jdbcType=TIMESTAMP})
+    </insert>
+    <select id="selectDatePerson" resultType="com.ruhua.domain.date.DateInfo" parameterType="Map">
+        select status from date where email = #{email,jdbcType=VARCHAR} and  date_email = #{dateEmail,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryDateMeUserInfo" resultType="com.ruhua.domain.date.DateUser" parameterType="Map">
+        SELECT date.datetime,date.loc,date.id,date.type,user.email,user.username AS userName,user_setting.age,user_profile.pic
+        FROM DATE,USER,user_profile,user_setting
+        WHERE date.email = user.email AND date.email = user_profile.email AND date.email = user_setting.email
+        AND date.date_email = #{email,jdbcType=VARCHAR}
+        order by date.createtime desc
+    </select>
+
+    <select id="queryDateMeUserInfoOne" resultType="com.ruhua.domain.date.DateAllInfo" parameterType="Map">
+        SELECT date.datetime,date.loc,date.id,date.status,date.type,date.lng as shopLng,date.lat as shopLat,user.email,
+        user.username AS userName,user_setting.age,user_setting.lng as userLng,user_setting.lat as userLat, user_profile.pic
+        FROM DATE,USER,user_profile,user_setting
+        WHERE date.email = user.email AND date.email = user_profile.email AND date.email = user_setting.email
+        AND date.id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <update id="savaDateStatus" parameterType="Map">
+       update date set status = #{status,jdbcType=INTEGER} where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>
